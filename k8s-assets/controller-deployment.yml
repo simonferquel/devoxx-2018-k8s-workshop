@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: etcdaas-controller
+  labels:
+    app: etcdaas-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: etcdaas-controller
+  template:
+    metadata:
+      labels:
+        app: etcdaas-controller
+    spec:
+      serviceAccount: etcdaas
+      containers:
+      - name: etcdaas-controller
+        image: etcdaas-controller
+        imagePullPolicy: Never
