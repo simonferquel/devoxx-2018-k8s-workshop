@@ -65,18 +65,24 @@ func (s *instanceStrategy) NamespaceScoped() bool {
 }
 
 func (s *instanceStrategy) PrepareForCreate(ctx genericapirequest.Context, obj runtime.Object) {
-
+	o := obj.(*v1alpha1.ETCDInstance)
+	fmt.Printf("PrepareForCreate %s spec: %#v, status: %#v\n", o.Name, o.Spec, o.Status)
 }
 
 func (s *instanceStrategy) Validate(ctx genericapirequest.Context, obj runtime.Object) field.ErrorList {
+	o := obj.(*v1alpha1.ETCDInstance)
+	fmt.Printf("Validate %s spec: %#v, status: %#v\n", o.Name, o.Spec, o.Status)
 	return nil
 }
 
 func (s *instanceStrategy) PrepareForUpdate(ctx genericapirequest.Context, obj, old runtime.Object) {
-
+	o := obj.(*v1alpha1.ETCDInstance)
+	fmt.Printf("PrepareForUpdate %s spec: %#v, status: %#v\n", o.Name, o.Spec, o.Status)
 }
 
 func (s *instanceStrategy) ValidateUpdate(ctx genericapirequest.Context, obj, old runtime.Object) field.ErrorList {
+	o := obj.(*v1alpha1.ETCDInstance)
+	fmt.Printf("ValidateUpdate %s spec: %#v, status: %#v\n", o.Name, o.Spec, o.Status)
 
 	return nil
 
@@ -91,4 +97,6 @@ func (s *instanceStrategy) AllowUnconditionalUpdate() bool {
 }
 
 func (s *instanceStrategy) Canonicalize(obj runtime.Object) {
+	o := obj.(*v1alpha1.ETCDInstance)
+	fmt.Printf("Canonicalize %s spec: %#v, status: %#v\n", o.Name, o.Spec, o.Status)
 }

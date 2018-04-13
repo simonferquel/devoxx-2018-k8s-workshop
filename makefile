@@ -52,20 +52,22 @@ deploy-crd:
 	kubectl apply -f ./k8s-assets/crd.yml
 
 uninstall-crd:
-	kubectl delete -f ./k8s-assets/crd.yml
+	kubectl delete -f ./k8s-assets/crd.yml || echo
 
 deploy-api: image/etcdaas-api
 	kubectl apply -f ./k8s-assets/sa.yml
 	kubectl apply -f ./k8s-assets/api-deployment.yml
 
 uninstall-api:
-	kubectl delete -f ./k8s-assets/api-deployment.yml
+	kubectl delete -f ./k8s-assets/api-deployment.yml || echo
 
 deploy-controller: image/etcdaas-controller
 	kubectl apply -f ./k8s-assets/sa.yml
 	kubectl apply -f ./k8s-assets/controller-deployment.yml
 	
 uninstall-controller:
-	kubectl delete -f ./k8s-assets/controller-deployment.yml
+	kubectl delete -f ./k8s-assets/controller-deployment.yml || echo
 
 deploy-all: deploy-api deploy-controller
+
+uninstall-all: uninstall-api uninstall-controller uninstall-crd
