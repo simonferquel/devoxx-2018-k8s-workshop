@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -13,7 +14,7 @@ import (
 )
 
 func main() {
-	var create, list, delete bool
+	var create, list, delete, backup bool
 	var name string
 	var namespace string
 	var replicas int
@@ -22,6 +23,7 @@ func main() {
 	flag.BoolVar(&list, "list", false, "list etcds")
 	flag.BoolVar(&delete, "delete", false, "delete an etcd")
 	flag.BoolVar(&tls, "enable-tls", false, "enable tls")
+	flag.BoolVar(&backup, "backup", false, "backup an etcd")
 	flag.StringVar(&name, "name", "", "etcd name")
 	flag.StringVar(&namespace, "namespace", "default", "k8s namespace")
 	flag.IntVar(&replicas, "replicas", 1, "etcd replicas")
@@ -65,5 +67,19 @@ func main() {
 		if err := c.ETCDInstances(namespace).Delete(name, nil); err != nil {
 			panic(err)
 		}
+	case backup:
+		r, err := c.RESTClient().
+			Get().
+			Namespace(namespace).
+			Resource("etcdinstances").
+			Name(name).
+			SubResource("backup").
+			Stream()
+		if err != nil {
+			panic(err)
+		}
+		defer r.Close()
+		io.Copy(os.Stdout, r)
+		fmt.Println()
 	}
 }

@@ -86,11 +86,12 @@ func runEtcdAPI(o *apiServerOptions, stopCh <-chan struct{}) error {
 	}
 
 	v1alpha1storage := map[string]rest.Storage{}
-	reg, err := reg.NewInstanceREST(Scheme, serverConfig.RESTOptionsGetter)
+	r, err := reg.NewInstanceREST(Scheme, serverConfig.RESTOptionsGetter)
 	if err != nil {
 		return err
 	}
-	v1alpha1storage["etcdinstances"] = reg
+	v1alpha1storage["etcdinstances"] = r
+	v1alpha1storage["etcdinstances/backup"] = reg.NewBackupREST()
 	apiGroupInfo.VersionedResourcesStorageMap["v1alpha1"] = v1alpha1storage
 
 	// install APIs and run the api server
