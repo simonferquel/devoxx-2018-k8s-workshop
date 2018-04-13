@@ -16,9 +16,9 @@ import (
 	"k8s.io/apiserver/pkg/storage/names"
 )
 
+// NewInstanceREST setup an API handler for etcd instances CRUD operations in the same way as any Kubernetes native object
 func NewInstanceREST(scheme *runtime.Scheme, optsGetter generic.RESTOptionsGetter) (*genericregistry.Store, error) {
 	strategy := &instanceStrategy{ObjectTyper: scheme, NameGenerator: names.SimpleNameGenerator}
-
 	store := &genericregistry.Store{
 		NewFunc:                  func() runtime.Object { return &v1alpha1.ETCDInstance{} },
 		NewListFunc:              func() runtime.Object { return &v1alpha1.ETCDInstanceList{} },
@@ -33,10 +33,10 @@ func NewInstanceREST(scheme *runtime.Scheme, optsGetter generic.RESTOptionsGette
 	if err := store.CompleteWithOptions(options); err != nil {
 		return nil, err
 	}
-
 	return store, nil
-
 }
+
+// get attributes usable for kubernetes filters
 func getEtcdAttrs(obj runtime.Object) (labels.Set, fields.Set, bool, error) {
 	etcd, ok := obj.(*v1alpha1.ETCDInstance)
 	if !ok {
@@ -44,6 +44,8 @@ func getEtcdAttrs(obj runtime.Object) (labels.Set, fields.Set, bool, error) {
 	}
 	return labels.Set(etcd.ObjectMeta.Labels), etcdToSelectableFields(etcd), etcd.Initializers != nil, nil
 }
+
+// this creates a selection predicate for requests with label/name filtering
 func matchEtcd(label labels.Selector, field fields.Selector) storage.SelectionPredicate {
 	return storage.SelectionPredicate{
 		Label:    label,
@@ -51,10 +53,13 @@ func matchEtcd(label labels.Selector, field fields.Selector) storage.SelectionPr
 		GetAttrs: getEtcdAttrs,
 	}
 }
+
+// returns the list of selectable fields for requesting objects (uses the default implementation: only expose object meta)
 func etcdToSelectableFields(obj *v1alpha1.ETCDInstance) fields.Set {
 	return generic.ObjectMetaFieldsSet(&obj.ObjectMeta, true)
 }
 
+// drives the behavior of CRUD operations
 type instanceStrategy struct {
 	runtime.ObjectTyper
 	names.NameGenerator

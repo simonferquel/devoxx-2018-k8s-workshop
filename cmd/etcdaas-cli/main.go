@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -26,7 +27,11 @@ func main() {
 	flag.IntVar(&replicas, "replicas", 1, "etcd replicas")
 	flag.Parse()
 
-	cfg, err := clientcmd.BuildConfigFromFlags("", filepath.Join(os.Getenv("HOME"), ".kube", "config"))
+	home := os.Getenv("HOME")
+	if home == "" {
+		home = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+	}
+	cfg, err := clientcmd.BuildConfigFromFlags("", filepath.Join(home, ".kube", "config"))
 	if err != nil {
 		panic(err)
 	}
@@ -46,6 +51,18 @@ func main() {
 		}
 		_, err := c.ETCDInstances(namespace).Create(i)
 		if err != nil {
+			panic(err)
+		}
+	case list:
+		lst, err := c.ETCDInstances(namespace).List(metav1.ListOptions{})
+		if err != nil {
+			panic(err)
+		}
+		for _, item := range lst.Items {
+			fmt.Printf("%s:\n\tspec: %#v,\n\tstatus: %#v\n", item.Name, item.Spec, item.Status)
+		}
+	case delete:
+		if err := c.ETCDInstances(namespace).Delete(name, nil); err != nil {
 			panic(err)
 		}
 	}

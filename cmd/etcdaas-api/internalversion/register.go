@@ -1,5 +1,7 @@
 package internalversion
 
+// this package helps registering internal version of etcdaas types in a Scheme
+
 import (
 	"github.com/simonferquel/devoxx-2018-k8s-workshop/pkg/apis/etcdaas/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -18,8 +20,10 @@ func Resource(resource string) schema.GroupResource {
 }
 
 var (
+	// SchemeBuilder is used to fill a Scheme
 	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)
-	AddToScheme   = SchemeBuilder.AddToScheme
+	// AddToScheme adds known types (and in real world scenarios conversions) to scheme
+	AddToScheme = SchemeBuilder.AddToScheme
 )
 
 // Adds the list of known types to the given scheme.

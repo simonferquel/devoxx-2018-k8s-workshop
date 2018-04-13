@@ -15,11 +15,15 @@ import (
 var (
 	groupFactoryRegistry = make(announced.APIGroupFactoryRegistry)
 	registry             = registered.NewOrDie("")
-	Scheme               = runtime.NewScheme()
-	Codecs               = serializer.NewCodecFactory(Scheme)
+
+	// Scheme of the API Server: contains all types manipulated by the API server
+	// (both externally e.g.: v1alpha.ETCDInstance, metav1.APIGroup... , and internally - in this case we use the same types for both external and internal version, but those are still 2 apigroupversions registered)
+	Scheme = runtime.NewScheme()
+	Codecs = serializer.NewCodecFactory(Scheme)
 )
 
 func init() {
+	// this register the groupAPI with all its versions (and version preference)
 	if err := announced.NewGroupMetaFactory(
 		&announced.GroupMetaFactoryArgs{
 			GroupName:                  v1alpha1.GroupName,
@@ -32,8 +36,12 @@ func init() {
 	).Announce(groupFactoryRegistry).RegisterAndEnable(registry, Scheme); err != nil {
 		panic(err)
 	}
+
+	// we also need types from metav1 for exchanging API metadata with the central API server
 	metav1.AddToGroupVersion(Scheme, schema.GroupVersion{Version: "v1"})
 
+	// and some unversioned flavors as well
+	// note: it is on k8s kube-aggregation TODO-list to remove these requiresments
 	unversioned := schema.GroupVersion{Group: "", Version: "v1"}
 	Scheme.AddUnversionedTypes(unversioned,
 		&metav1.Status{},
