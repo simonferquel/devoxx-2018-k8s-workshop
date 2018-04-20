@@ -55,5 +55,5 @@ type backupHandler struct {
 }
 
 func (h *backupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// **** Serve me
+	w.Write([]byte(fmt.Sprintf("this is a backup for %s/%s", h.ns, h.id)))
 }
