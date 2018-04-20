@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -53,8 +54,16 @@ func main() {
 			panic(err)
 		}
 	case list:
-		// List me
+		lst, err := c.ETCDInstances(namespace).List(metav1.ListOptions{})
+		if err != nil {
+			panic(err)
+		}
+		for _, item := range lst.Items {
+			fmt.Printf("%s:\n\tspec: %#v,\n\tstatus: %#v\n", item.Name, item.Spec, item.Status)
+		}
 	case delete:
-		// Delete me
+		if err := c.ETCDInstances(namespace).Delete(name, nil); err != nil {
+			panic(err)
+		}
 	}
 }
