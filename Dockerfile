@@ -17,3 +17,11 @@ RUN make bin/etcdaas-controller
 FROM runtime-base AS controller
 COPY --from=controller-builder /go/src/github.com/simonferquel/devoxx-2018-k8s-workshop/bin/etcdaas-controller /etcdaas-controller
 ENTRYPOINT [ "/etcdaas-controller" ]
+
+
+FROM builder-base AS api-builder
+RUN make bin/etcdaas-api
+
+FROM runtime-base AS api
+COPY --from=api-builder /go/src/github.com/simonferquel/devoxx-2018-k8s-workshop/bin/etcdaas-api /etcdaas-api
+ENTRYPOINT [ "/etcdaas-api" ]

@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: etcdaas-api
+  labels:
+    app: etcdaas-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: etcdaas-api
+  template:
+    metadata:
+      labels:
+        app: etcdaas-api
+    spec:
+      serviceAccount: etcdaas
+      hostNetwork: true
+      containers:
+      - name: etcdaas-api
+        image: etcdaas-api
+        imagePullPolicy: Never
+        command:
+        - "/etcdaas-api" 
+        - "--etcd-servers=http://127.0.0.1:2379"
+---
+kind: "Service"
+apiVersion: "v1"
+metadata:
+  name: "etcdaas-api"
+  namespace: "default"
+spec:
+  ports:
+    - name: "extension-api"
+      protocol: "TCP"
+      port: 443
+      targetPort: 443
+  selector:
+    app: etcdaas-api
+---
+apiVersion: apiregistration.k8s.io/v1beta1
+kind: APIService
+metadata:
+  name: v1alpha1.etcdaas.devoxx2018
+spec:
+  insecureSkipTLSVerify: true
+  group: etcdaas.devoxx2018
+  groupPriorityMinimum: 1000
+  versionPriority: 15
+  service:
+    name: etcdaas-api
+    namespace: default
+  version: v1alpha1
