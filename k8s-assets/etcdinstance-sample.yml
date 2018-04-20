@@ -1,0 +1,4 @@
+apiVersion: etcdaas.devoxx2018/v1alpha1
+kind: ETCDInstance
+metadata:
+  name: myinstance
