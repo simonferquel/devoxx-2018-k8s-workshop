@@ -49,7 +49,19 @@ func (c *controller) OnAdd(obj interface{}) {
 	}
 	fmt.Printf("OnAdd:\n %#v\n", *etcd)
 
-	// **** Add me
+	etcd.Status = types.ETCDInstanceStatus{
+		State:   types.ETCDDeploying,
+		Message: "deploying",
+	}
+	etcd, _ = c.client.EtcdaasV1alpha1().ETCDInstances(etcd.Namespace).Update(etcd)
+
+	time.Sleep(10 * time.Second)
+
+	etcd.Status = types.ETCDInstanceStatus{
+		State:   types.ETCDRunning,
+		Message: "deployment successfull",
+	}
+	c.client.EtcdaasV1alpha1().ETCDInstances(etcd.Namespace).Update(etcd)
 }
 
 func (c *controller) OnUpdate(oldObj, newObj interface{}) {
@@ -68,7 +80,19 @@ func (c *controller) OnUpdate(oldObj, newObj interface{}) {
 		return
 	}
 
-	// **** Update me
+	newetcd.Status = types.ETCDInstanceStatus{
+		State:   types.ETCDDeploying,
+		Message: "updating",
+	}
+	newetcd, _ = c.client.EtcdaasV1alpha1().ETCDInstances(newetcd.Namespace).Update(newetcd)
+
+	time.Sleep(10 * time.Second)
+
+	newetcd.Status = types.ETCDInstanceStatus{
+		State:   types.ETCDRunning,
+		Message: "update successfull",
+	}
+	c.client.EtcdaasV1alpha1().ETCDInstances(newetcd.Namespace).Update(newetcd)
 }
 
 func (c *controller) OnDelete(obj interface{}) {
