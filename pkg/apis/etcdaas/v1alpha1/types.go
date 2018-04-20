@@ -12,7 +12,8 @@ type ETCDInstance struct {
 }
 
 type ETCDInstanceSpec struct {
-	// *** Fill me
+	Replicas      int  `json:"replicas,omitempty"`
+	WithTLSBundle bool `json:"with_tls_bundle,omitempty"`
 }
 
 type ETCDInstanceState string
